@@ -1,3 +1,11 @@
+"
+I'm an helper to convert in a nice way (not destroying GT meta data) example classes into test case.
+Here is a typical example.
+
+```
+Uniter new forClass: BlCollectionRopeIteratorExamples; generate
+```
+"
 Class {
 	#name : #Uniter,
 	#superclass : #Object,
