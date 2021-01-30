@@ -26,7 +26,18 @@ Uniter >> generate [
 	"self new forClass: BlAttributeRopeExamples; generate"
 	self generateTestCaseClass.
 	self generateMethods.
+	self generateClassOriginString
 	
+]
+
+{ #category : #accessing }
+Uniter >> generateClassOriginString [
+	
+	newClass 
+			compile: ('originClassName
+	"This test was generated from..."
+	^ ''', forClass name, '''') 
+		 	classified: 'metadata'
 ]
 
 { #category : #accessing }
