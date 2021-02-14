@@ -51,15 +51,26 @@ Uniter >> generateClassOriginString [
 { #category : #accessing }
 Uniter >> generateMethods [
 	"self new forClass: BlAttributeRopeExamples ; generateMethods"
-	| ast |
-	forClass methods do: [ :each | 
-		| sel |
-		sel := self treatSelector: each selector.
-	   ast := each ast.
-		newClass 
-			compile: (ast selector: ('test', sel) asSymbol) formattedCode
-		 	classified: 'tests'
-		 ]
+	| ast methods |
+	methods := forClass localMethods groupedBy: [:each | each hasPragmaNamed: 'gtExample'].
+	(methods at: true)
+		do: [ :each | 
+			| sel |
+			sel := self treatSelector: each selector.
+		   ast := each ast.
+			newClass 
+				compile: (ast selector: ('test', sel) asSymbol) formattedCode
+			 	classified: 'tests'
+		 ].
+	(methods at: false)
+		do: [ :each | 
+			| sel |
+			sel := self treatSelector: each selector.
+		   ast := each ast.
+			newClass 
+				compile: (ast selector: sel asSymbol) formattedCode
+			 	classified: 'fixture'
+		 ].
 ]
 
 { #category : #accessing }
@@ -69,11 +80,12 @@ Uniter >> generateTestCaseClass [
 	| newName builder |
 	newName := forClass name allButLast: 'Examples' size.
 	newName := newName, 'Test'.
-	builder := FluidClassBuilder new.
-	builder 
+	builder := (Smalltalk globals at: #FluidClassBuilder) new.
+	builder
 		  superclassToBuild: TestCase;
 		  classNameToBuild: newName;
 		  package: (RPackageOrganizer default packageOf: forClass) packageName.
+	forClass traits ifNotEmpty: [ :t | builder traitComposition: t  ].
 	builder install.
 	newClass := self class environment at: newName asSymbol.
 	self addComment.

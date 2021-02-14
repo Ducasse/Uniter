@@ -5,6 +5,12 @@ Here is a typical example.
 ```
 UniterForP8 new forClass: BlVector2DExamples; generate
 ```
+
+To do
+- only convert method with gtExample tag 
+- manage superclass 
+- use local and not methods else trait methods are duplicated.
+
 "
 Class {
 	#name : #UniterForP8,
