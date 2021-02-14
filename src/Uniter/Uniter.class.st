@@ -56,12 +56,13 @@ Uniter >> generateMethods [
 	(methods at: true)
 		do: [ :each | 
 			| sel |
-			sel := self treatSelector: each selector.
+			sel := self treatSelectorForTest: each selector.
 		   ast := each ast.
 			newClass 
 				compile: (ast selector: ('test', sel) asSymbol) formattedCode
 			 	classified: 'tests'
 		 ].
+	
 	(methods at: false)
 		do: [ :each | 
 			| sel |
@@ -95,12 +96,19 @@ Uniter >> generateTestCaseClass [
 Uniter >> treatSelector: aSymbol [
 	(aSymbol includes: $_) 	
 		ifTrue: [ ^ self treatUnderscoredSelector: aSymbol ].
+	^ aSymbol 
+]
+
+{ #category : #accessing }
+Uniter >> treatSelectorForTest: aSymbol [
+	(aSymbol includes: $_) 	
+		ifTrue: [ ^ self treatUnderscoredSelector: aSymbol ].
 	^ aSymbol capitalized 
 ]
 
 { #category : #accessing }
 Uniter >> treatUnderscoredSelector: aSymbolWithUnderscores [
-	
+	"replace _ ne_maman -> neManan"
 	
 	^ String streamContents: [ :s |
 		| under |
