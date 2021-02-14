@@ -63,15 +63,17 @@ Uniter >> generateMethods [
 			 	classified: 'tests'
 		 ].
 	
-	(methods at: false)
-		do: [ :each | 
-			| sel |
-			sel := self treatSelector: each selector.
-		   ast := each ast.
-			newClass 
-				compile: (ast selector: sel asSymbol) formattedCode
-			 	classified: 'fixture'
-		 ].
+	methods 
+		at: false 
+		ifPresent: [ :ms |
+			ms do: [ :each | 
+				| sel |
+				sel := self treatSelector: each selector.
+		 	  ast := each ast.
+				newClass 
+					compile: (ast selector: sel asSymbol) formattedCode
+			 		classified: 'fixture' ]]
+		 
 ]
 
 { #category : #accessing }
