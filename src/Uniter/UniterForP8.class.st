@@ -25,10 +25,20 @@ UniterForP8 >> generateTestCaseClass [
 	| newName |
 	newName := forClass name allButLast: 'Examples' size.
 	newName := newName, 'Test'.
+	forClass traits 
+		ifNotEmpty: [ :t | 
 	TestCase subclass: newName asSymbol
+		uses: t
 		instanceVariableNames: forClass instanceVariablesString
 		classVariableNames: ''
-		package: (RPackageOrganizer default packageOf: forClass) packageName.
+		package: (RPackageOrganizer default packageOf: forClass) packageName. ]
+		ifEmpty: [ 
+			TestCase subclass: newName asSymbol
+		instanceVariableNames: forClass instanceVariablesString
+		classVariableNames: ''
+		package: (RPackageOrganizer default packageOf: forClass) packageName. 
+			 ].
+		
 	newClass := self class environment at: newName asSymbol.
 	self addComment.
 ]
