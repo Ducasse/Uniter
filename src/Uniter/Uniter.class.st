@@ -72,7 +72,8 @@ Uniter >> generateTestCaseClass [
 	| newName builder |
 	newName := forClass name allButLast: 'Examples' size.
 	newName := newName, 'Test'.
-	builder := (Smalltalk globals at: #FluidClassBuilder) new.
+	self class environment at: newName asSymbol ifPresent: [ newName := newName, 'Zork248' ].
+	builder := (self class environment at: #FluidClassBuilder) new.
 	builder
 		  superclassToBuild: TestCase;
 		  classNameToBuild: newName;
