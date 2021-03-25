@@ -23,13 +23,13 @@ Uniter >> addComment [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #API }
 Uniter >> forClass: aClass [
 
 	forClass := aClass
 ]
 
-{ #category : #accessing }
+{ #category : #API }
 Uniter >> generate [
 	"self new forClass: BlAttributeRopeExamples; generate"
 	self generateTestCaseClass.
@@ -38,7 +38,15 @@ Uniter >> generate [
 	
 ]
 
-{ #category : #accessing }
+{ #category : #internals }
+Uniter >> generateClassMethods [
+	"self new forClass: BlAttributeRopeExamples ; generateMethods"
+	| methods |
+	methods := forClass class localMethods groupedBy: [:each | each hasPragmaNamed: 'gtExample'].
+	self handleMethodFromSplitDictionary: methods.
+]
+
+{ #category : #internals }
 Uniter >> generateClassOriginString [
 	
 	newClass 
@@ -48,35 +56,16 @@ Uniter >> generateClassOriginString [
 		 	classified: 'metadata'
 ]
 
-{ #category : #accessing }
+{ #category : #internals }
 Uniter >> generateMethods [
 	"self new forClass: BlAttributeRopeExamples ; generateMethods"
-	| ast methods |
+
+	| methods |
 	methods := forClass localMethods groupedBy: [:each | each hasPragmaNamed: 'gtExample'].
-	(methods at: true)
-		do: [ :each | 
-			| sel |
-			sel := self treatSelectorForTest: each selector.
-		   ast := each ast.
-			newClass 
-				compile: (ast selector: ('test', sel) asSymbol) formattedCode
-			 	classified: 'tests'
-		 ].
-	
-	methods 
-		at: false 
-		ifPresent: [ :ms |
-			ms do: [ :each | 
-				| sel |
-				sel := self treatSelector: each selector.
-		 	  ast := each ast.
-				newClass 
-					compile: (ast selector: sel asSymbol) formattedCode
-			 		classified: 'fixture' ]]
-		 
+	self handleMethodFromSplitDictionary: methods.
 ]
 
-{ #category : #accessing }
+{ #category : #internals }
 Uniter >> generateTestCaseClass [
 	"Pay attention if there is a super class"
 	"self new forClass: BlAttributeRopeExamples; generateTestCaseClass"
@@ -94,14 +83,40 @@ Uniter >> generateTestCaseClass [
 	self addComment.
 ]
 
-{ #category : #accessing }
+{ #category : #internals }
+Uniter >> handleMethodFromSplitDictionary: aDict [
+	
+	(aDict at: true)
+		do: [ :each | 
+			| sel ast |
+			sel := self treatSelectorForTest: each selector.
+		   ast := each ast.
+			newClass 
+				compile: (ast selector: ('test', sel) asSymbol) formattedCode
+			 	classified: 'tests'
+		 ].
+	
+	aDict 
+		at: false 
+		ifPresent: [ :ms |
+			ms do: [ :each | 
+				| sel ast |
+				sel := self treatSelector: each selector.
+		 	  ast := each ast.
+				newClass 
+					compile: (ast selector: sel asSymbol) formattedCode
+			 		classified: 'fixture' ]]
+		 
+]
+
+{ #category : #internals }
 Uniter >> treatSelector: aSymbol [
 	(aSymbol includes: $_) 	
 		ifTrue: [ ^ self treatUnderscoredSelector: aSymbol ].
 	^ aSymbol 
 ]
 
-{ #category : #accessing }
+{ #category : #internals }
 Uniter >> treatSelectorForTest: aSymbol [
 	(aSymbol includes: $_) 	
 		ifTrue: [ ^ self treatUnderscoredSelector: aSymbol ].
