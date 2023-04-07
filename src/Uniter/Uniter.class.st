@@ -76,7 +76,7 @@ Uniter >> generateTestCaseClass [
 	builder := (self class environment at: #FluidClassBuilder) new.
 	builder
 		  superclassToBuild: TestCase;
-		  classNameToBuild: newName;
+		  nameToBuild: newName;
 		  package: (RPackageOrganizer default packageOf: forClass) packageName.
 	forClass traits ifNotEmpty: [ :t | builder traitComposition: t  ].
 	builder install.
