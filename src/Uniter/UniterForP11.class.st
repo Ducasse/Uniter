@@ -13,13 +13,13 @@ To do
 
 "
 Class {
-	#name : #UniterForP8,
+	#name : #UniterForP11,
 	#superclass : #Uniter,
 	#category : #Uniter
 }
 
 { #category : #accessing }
-UniterForP8 >> generateTestCaseClass [
+UniterForP11 >> generateTestCaseClass [
 	"Pay attention if there is a super class"
 	"self new forClass: BlAttributeRopeExamples; generateTestCaseClass"
 	| newName |
