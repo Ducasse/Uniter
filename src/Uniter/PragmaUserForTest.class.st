@@ -5,9 +5,15 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+PragmaUserForTest >> usingPragmaGT [
+
+	<gtExample>
+	^ 999
+]
+
+{ #category : #'as yet unclassified' }
 PragmaUserForTest >> usingPragmaTintin [
 
 	<tintin>
-	
 	^ 999
 ]

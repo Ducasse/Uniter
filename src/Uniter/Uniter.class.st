@@ -5,6 +5,10 @@ Here is a typical example.
 ```
 Uniter new forClass: BlCollectionRopeIteratorExamples; generate
 ```
+
+```
+Uniter new forClass: PragmaUserForTest ; fixPragma
+```
 "
 Class {
 	#name : #Uniter,
@@ -20,6 +24,20 @@ Class {
 Uniter >> addComment [
 	newClass comment: 'I have been automatically converted and probably manually tweaked from ', forClass name, '. Pay attention there is an important design decision in such tests. First to let GT people execute them, the tests and helpers are tagged with <gtExample> do not remove them, let also the <label:...>.
 	Finally and more important such tests should not use setup because every method should be in capacity of returning a fully working object called an example :)'
+	
+]
+
+{ #category : #API }
+Uniter >> fixPragma [
+
+	| converter |
+	converter := PragmaConverter new.
+	converter convert: 'gtExample' into: 'sampleInstance'.
+	
+	forClass methods do: [ :cm | 
+		
+		cm origin compile: (converter convert: cm) ast formattedCode classified: cm protocol
+	]
 	
 ]
 
