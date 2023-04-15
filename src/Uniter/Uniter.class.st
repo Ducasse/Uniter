@@ -15,7 +15,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'forClass',
-		'newClass'
+		'newClass',
+		'selectorMapping'
 	],
 	#category : #Uniter
 }
@@ -103,12 +104,60 @@ Uniter >> generateTestCaseClass [
 ]
 
 { #category : #internals }
+Uniter >> handleMethodFromSplitDictionary2: aDict [
+	
+	(aDict at: true)
+		do: [ :each | 
+			| sel |
+			sel := self treatSelectorForTest: each selector.
+			selectorMapping at: each selector put: ('test', sel) asSymbol.
+		 ].
+	
+	aDict 
+		at: false 
+		ifPresent: [ :ms |
+			ms do: [ :each | 
+				| sel |
+				sel := self treatSelector: each selector.
+				selectorMapping at: each selector put: sel ]].
+		
+		
+	(aDict at: true)
+		do: [ :each | 
+			| sel ast |
+		   ast := SelfSenderFixer new 
+						mappingSelector: selectorMapping ; 
+						convertAst: each ast;
+						ast.
+			sel := selectorMapping at: each selector.
+			newClass 
+				compile: (ast selector: ('test', sel) asSymbol) formattedCode
+			 	classified: 'tests'
+		 ].
+	
+	aDict 
+		at: false 
+		ifPresent: [ :ms |
+			ms do: [ :each | 
+				| sel ast |
+		   		ast := SelfSenderFixer new 
+						mappingSelector: selectorMapping ; 
+						convertAst: each ast;
+						ast.
+				sel := selectorMapping at: each selector.
+				newClass
+					compile: (ast selector: sel asSymbol) formattedCode
+			 		classified: 'fixture' ]]
+]
+
+{ #category : #internals }
 Uniter >> handleMethodFromSplitDictionary: aDict [
 	
 	(aDict at: true)
 		do: [ :each | 
 			| sel ast |
 			sel := self treatSelectorForTest: each selector.
+			selectorMapping at: each selector put: ('test', sel) asSymbol.
 		   ast := each ast.
 			newClass 
 				compile: (ast selector: ('test', sel) asSymbol) formattedCode
@@ -121,11 +170,19 @@ Uniter >> handleMethodFromSplitDictionary: aDict [
 			ms do: [ :each | 
 				| sel ast |
 				sel := self treatSelector: each selector.
+				selectorMapping at: each selector put: sel.
 		 	  ast := each ast.
 				newClass 
 					compile: (ast selector: sel asSymbol) formattedCode
 			 		classified: 'fixture' ]]
 		 
+]
+
+{ #category : #initialization }
+Uniter >> initialize [
+
+	super initialize.
+	selectorMapping := Dictionary new. 
 ]
 
 { #category : #internals }
