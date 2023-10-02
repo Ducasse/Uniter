@@ -6,8 +6,15 @@ Here is a typical example.
 Uniter new forClass: BlCollectionRopeIteratorExamples; generate
 ```
 
+Here we fix the pragma (pay attention that it will impact the migration of method so better do it at the end)
+
 ```
 Uniter new forClass: PragmaUserForTest ; fixPragma
+```
+
+Here we fix the pragma of an already migrated class using message `fixPragmaFor:`
+```
+UniterForP11 new fixPragmaFor: BlGeometryVisualAndLayoutBoundsTest
 ```
 "
 Class {
@@ -35,10 +42,20 @@ Uniter >> fixPragma [
 	converter := PragmaConverter new.
 	converter convert: 'gtExample' into: 'sampleInstance'.
 	
-	forClass methods do: [ :cm | 
-		
-		cm origin compile: (converter convert: cm) ast formattedCode classified: cm protocol
-	]
+	newClass methods do: [ :cm | 
+		cm origin compile: (converter convert: cm) ast formattedCode classified: cm protocol ]
+	
+]
+
+{ #category : #API }
+Uniter >> fixPragmaFor: aClass [
+
+	| converter |
+	converter := PragmaConverter new.
+	converter convert: 'gtExample' into: 'sampleInstance'.
+	
+	aClass methods do: [ :cm | 
+		cm origin compile: (converter convert: cm) ast formattedCode classified: cm protocol ]
 	
 ]
 
@@ -62,7 +79,7 @@ Uniter >> generateClassMethods [
 	"self new forClass: BlAttributeRopeExamples ; generateMethods"
 	| methods |
 	methods := forClass class localMethods groupedBy: [:each | each hasPragmaNamed: 'gtExample'].
-	self handleMethodFromSplitDictionary: methods.
+	self handleMethodFromSplitDictionary2: methods.
 ]
 
 { #category : #internals }
@@ -81,7 +98,7 @@ Uniter >> generateMethods [
 
 	| methods |
 	methods := forClass localMethods groupedBy: [:each | each hasPragmaNamed: 'gtExample'].
-	self handleMethodFromSplitDictionary: methods.
+	self handleMethodFromSplitDictionary2: methods.
 ]
 
 { #category : #internals }
@@ -105,14 +122,14 @@ Uniter >> generateTestCaseClass [
 
 { #category : #internals }
 Uniter >> handleMethodFromSplitDictionary2: aDict [
-	
-	(aDict at: true)
-		do: [ :each | 
+
+	aDict at: true ifPresent: [ :m |
+		m do: [ :each | 
 			| sel |
 			sel := self treatSelectorForTest: each selector.
 			selectorMapping at: each selector put: ('test', sel) asSymbol.
-		 ].
-	
+		 ]].
+
 	aDict 
 		at: false 
 		ifPresent: [ :ms |
@@ -120,10 +137,10 @@ Uniter >> handleMethodFromSplitDictionary2: aDict [
 				| sel |
 				sel := self treatSelector: each selector.
 				selectorMapping at: each selector put: sel ]].
-		
-		
-	(aDict at: true)
-		do: [ :each | 
+
+
+	aDict at: true ifPresent: [ :m |
+		m do: [ :each | 
 			| sel ast |
 		   ast := SelfSenderFixer new 
 						mappingSelector: selectorMapping ; 
@@ -133,8 +150,8 @@ Uniter >> handleMethodFromSplitDictionary2: aDict [
 			newClass 
 				compile: (ast selector: ('test', sel) asSymbol) formattedCode
 			 	classified: 'tests'
-		 ].
-	
+		 ]].
+
 	aDict 
 		at: false 
 		ifPresent: [ :ms |
@@ -153,8 +170,8 @@ Uniter >> handleMethodFromSplitDictionary2: aDict [
 { #category : #internals }
 Uniter >> handleMethodFromSplitDictionary: aDict [
 	
-	(aDict at: true)
-		do: [ :each | 
+	aDict at: true ifPresent: [ :m |
+		m do: [ :each | 
 			| sel ast |
 			sel := self treatSelectorForTest: each selector.
 			selectorMapping at: each selector put: ('test', sel) asSymbol.
@@ -162,7 +179,7 @@ Uniter >> handleMethodFromSplitDictionary: aDict [
 			newClass 
 				compile: (ast selector: ('test', sel) asSymbol) formattedCode
 			 	classified: 'tests'
-		 ].
+		 ] ].
 	
 	aDict 
 		at: false 

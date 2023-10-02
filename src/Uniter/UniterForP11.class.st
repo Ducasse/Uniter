@@ -3,7 +3,11 @@ I'm an helper to convert in a nice way (not destroying GT meta data) example cla
 Here is a typical example.
 
 ```
-UniterForP8 new forClass: BlVector2DExamples; generate
+UniterForP11 new forClass: BlVector2DExamples; generate
+```
+
+```
+UniterForP11 new forClass: BlGeometryVisualAndLayoutBoundsTest; fixPragma
 ```
 
 To do
